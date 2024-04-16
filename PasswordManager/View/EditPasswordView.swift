@@ -19,13 +19,10 @@ struct EditPasswordView: View {
 	@State private var password = ""
 	
 	var body: some View {
-		Form {
-			Section {
-				TextFieldView(title: "\(pw.title!)", text: $title)
-				TextFieldView(title: "\(pw.username!)", text: $username)
-				TextFieldView(title: "\(password)", text: $password)
-			}
-			.padding()
+		VStack {
+				TextFieldView(title: "Title", text: $title)
+				TextFieldView(title: "Username", text: $username)
+				TextFieldView(title: "Password", text: $password)
 			
 			HStack {
 				Spacer()
@@ -33,7 +30,11 @@ struct EditPasswordView: View {
 					pwManager.editPassword(Password(title: title, username: username, password: password), to: pw, context: managedObjContext)
 					dismiss()
 				}, label: {
-					Text("Submit")
+					HStack {
+						Spacer()
+						Text("Submit")
+						Spacer()
+					}
 				})
 			}
 			

@@ -36,7 +36,16 @@ struct PasswordDetailView: View {
       Spacer()
     }
     .padding()
-    .customNavBarItems(title: pw.title!, showAddButton: true, buttonName: "Edit")
+    .customNavBarItems(title: pw.title!)
+		.toolbar {
+			ToolbarItem(placement: .navigationBarTrailing) {
+				Button {
+					showEditView.toggle()
+				} label: {
+					Label("Edit", systemImage: "edit")
+				}
+			}
+		}
   }
 }
 
