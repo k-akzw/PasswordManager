@@ -27,18 +27,18 @@ class PasswordManager {
       do {
         key = try SymmetricKey(data: keyData)
       } catch {
-        // Handle error if there's an issue initializing SymmetricKey from data
+        // error initializing symmetric key from data
         print("Error initializing SymmetricKey from data:", error)
       }
     } else {
-      // Generate a new SymmetricKey if one doesn't exist in UserDefaults
+      // generate symmetric key if it doesn't exist yet
       key = SymmetricKey(size: .bits256)
       do {
-        // Convert SymmetricKey to Data and store in UserDefaults
+        // convert symmetric key to Data and store in UserDefaults
         let keyData = try key.withUnsafeBytes { Data($0) }
         UserDefaults.standard.set(keyData, forKey: symmetricKey)
       } catch {
-        // Handle error if there's an issue converting SymmetricKey to data
+        // error converting symmetric key to data
         print("Error converting SymmetricKey to data:", error)
       }
     }

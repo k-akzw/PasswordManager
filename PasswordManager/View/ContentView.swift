@@ -16,7 +16,7 @@ struct ContentView: View {
   @State var accessGranted = false
 
   var body: some View {
-    CustomNavView {
+    NavigationView {
       VStack {
         Spacer()
 
@@ -35,22 +35,18 @@ struct ContentView: View {
 
         MasterPasswordView(accessGranted: $accessGranted)
 
-        CustomNavLink(destination: PasswordListView(), isActive: $accessGranted) {
+        NavigationLink(destination: PasswordListView(), isActive: $accessGranted) {
           EmptyView()
         }
 
         Spacer()
       }
       .padding()
-			.toolbar {
-				ToolbarItem(placement: .navigationBarTrailing) {
-					Button {
-					} label: {
-						Label("Add View", systemImage: "plus.circle")
-					}
-				}
-			}
-			.customNavigationTitle("Password")
+      .navigationTitle("Password")
+      .navigationBarTitleDisplayMode(.inline)
+      .toolbarBackground(.orange, for: .navigationBar)
+      .toolbarBackground(.visible, for: .navigationBar)
+      .toolbarColorScheme(.dark, for: .navigationBar)
     }
   }
 }
@@ -58,7 +54,7 @@ struct ContentView: View {
 struct MasterPasswordView: View {
   var pwManager = PasswordManager.shared
   @State var masterPassword = ""
-  @State var passwordEntered = false
+  @State var pwEntered = false
 
   @Binding var accessGranted: Bool
 
@@ -94,14 +90,14 @@ struct MasterPasswordView: View {
           // so that it doesn't give error message
           // while retyping the password
           if newVal.isEmpty {
-            passwordEntered = false
+            pwEntered = false
           }
         })
         .onSubmit {
           if pwManager.doesMasterPasswordExist() {
             accessGranted = pwManager.doesMasterPasswordMatch(masterPassword)
             if !accessGranted {
-              passwordEntered = true
+              pwEntered = true
             }
           } else {
             pwManager.setMasterPassword(masterPassword)
@@ -113,7 +109,7 @@ struct MasterPasswordView: View {
         .foregroundStyle(.red)
         .frame(maxWidth: .infinity, alignment: .leading)
         .offset(x: 10)
-        .opacity(!masterPassword.isEmpty && passwordEntered ? 1 : 0)
+        .opacity(!masterPassword.isEmpty && pwEntered ? 1 : 0)
     }
   }
 }

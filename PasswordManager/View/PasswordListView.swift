@@ -20,9 +20,7 @@ struct PasswordListView: View {
     VStack {
       List {
         ForEach(pw) { pw in
-          @State var showDetailView = false
-          @State var showEditView = false
-          CustomNavLink(destination: PasswordDetailView(pw: pw), isActive: $showDetailView) {
+          NavigationLink(destination: PasswordDetailView(pw: pw)) {
             VStack {
               Text(pw.title!)
                 .font(.subheadline)
@@ -36,29 +34,30 @@ struct PasswordListView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
           }
-          .onTapGesture {
-            showDetailView = true
-          }
         }
         .onDelete(perform: deletePassword)
       }
 
-      CustomNavLink(destination: AddPasswordView(), isActive: $showAddView) {
+      NavigationLink(destination: AddPasswordView(), isActive: $showAddView) {
         EmptyView()
       }
 
       Spacer()
     }
+    .navigationTitle("Password List")
 		.toolbar {
 			ToolbarItem(placement: .navigationBarTrailing) {
 				Button {
 					showAddView.toggle()
 				} label: {
-					Label("Add View", systemImage: "plus.circle")
+					Label("Add", systemImage: "plus.circle")
 				}
 			}
 		}
-		.customNavigationTitle("Password List")
+    .toolbarBackground(.orange, for: .navigationBar)
+    .toolbarBackground(.visible, for: .navigationBar)
+    .toolbarColorScheme(.dark, for: .navigationBar)
+    .navigationBarBackButtonHidden()
   }
 
   private func deletePassword(offsets: IndexSet) {

@@ -14,11 +14,6 @@
 		14E7CD2A2BCDA75B007053F2 /* PasswordManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14E7CD292BCDA75B007053F2 /* PasswordManagerTests.swift */; };
 		14E7CD342BCDA75B007053F2 /* PasswordManagerUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14E7CD332BCDA75B007053F2 /* PasswordManagerUITests.swift */; };
 		14E7CD362BCDA75B007053F2 /* PasswordManagerUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14E7CD352BCDA75B007053F2 /* PasswordManagerUITestsLaunchTests.swift */; };
-		298051BF2BCDCE22003AFAA1 /* CustomNavView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 298051BE2BCDCE22003AFAA1 /* CustomNavView.swift */; };
-		298051C12BCDCE2D003AFAA1 /* CustomNavBarContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 298051C02BCDCE2D003AFAA1 /* CustomNavBarContainerView.swift */; };
-		298051C32BCDCE39003AFAA1 /* CustomNavBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 298051C22BCDCE39003AFAA1 /* CustomNavBarView.swift */; };
-		298051C52BCDCE42003AFAA1 /* CustomNavLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 298051C42BCDCE42003AFAA1 /* CustomNavLink.swift */; };
-		298051C72BCDCE4E003AFAA1 /* CustomNavBarPreferenceKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 298051C62BCDCE4E003AFAA1 /* CustomNavBarPreferenceKey.swift */; };
 		298051C92BCDD21B003AFAA1 /* PasswordListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 298051C82BCDD21B003AFAA1 /* PasswordListView.swift */; };
 		298051CB2BCE0DFF003AFAA1 /* PasswordDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 298051CA2BCE0DFF003AFAA1 /* PasswordDetailView.swift */; };
 		298051CF2BCE3C0A003AFAA1 /* EditPasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 298051CE2BCE3C0A003AFAA1 /* EditPasswordView.swift */; };
@@ -56,11 +51,6 @@
 		14E7CD2F2BCDA75B007053F2 /* PasswordManagerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PasswordManagerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		14E7CD332BCDA75B007053F2 /* PasswordManagerUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordManagerUITests.swift; sourceTree = "<group>"; };
 		14E7CD352BCDA75B007053F2 /* PasswordManagerUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordManagerUITestsLaunchTests.swift; sourceTree = "<group>"; };
-		298051BE2BCDCE22003AFAA1 /* CustomNavView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomNavView.swift; sourceTree = "<group>"; };
-		298051C02BCDCE2D003AFAA1 /* CustomNavBarContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomNavBarContainerView.swift; sourceTree = "<group>"; };
-		298051C22BCDCE39003AFAA1 /* CustomNavBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomNavBarView.swift; sourceTree = "<group>"; };
-		298051C42BCDCE42003AFAA1 /* CustomNavLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomNavLink.swift; sourceTree = "<group>"; };
-		298051C62BCDCE4E003AFAA1 /* CustomNavBarPreferenceKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomNavBarPreferenceKey.swift; sourceTree = "<group>"; };
 		298051C82BCDD21B003AFAA1 /* PasswordListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordListView.swift; sourceTree = "<group>"; };
 		298051CA2BCE0DFF003AFAA1 /* PasswordDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordDetailView.swift; sourceTree = "<group>"; };
 		298051CE2BCE3C0A003AFAA1 /* EditPasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditPasswordView.swift; sourceTree = "<group>"; };
@@ -122,7 +112,6 @@
 				29CE83812BCDB200003BB674 /* Model */,
 				29CE83822BCDB214003BB674 /* View */,
 				29CE83852BCDB6B8003BB674 /* DataModel */,
-				298051BD2BCDCE08003AFAA1 /* CustomNavBar */,
 				14E7CD1C2BCDA75B007053F2 /* Assets.xcassets */,
 				14E7CD1E2BCDA75B007053F2 /* Preview Content */,
 			);
@@ -152,18 +141,6 @@
 				14E7CD352BCDA75B007053F2 /* PasswordManagerUITestsLaunchTests.swift */,
 			);
 			path = PasswordManagerUITests;
-			sourceTree = "<group>";
-		};
-		298051BD2BCDCE08003AFAA1 /* CustomNavBar */ = {
-			isa = PBXGroup;
-			children = (
-				298051BE2BCDCE22003AFAA1 /* CustomNavView.swift */,
-				298051C02BCDCE2D003AFAA1 /* CustomNavBarContainerView.swift */,
-				298051C22BCDCE39003AFAA1 /* CustomNavBarView.swift */,
-				298051C42BCDCE42003AFAA1 /* CustomNavLink.swift */,
-				298051C62BCDCE4E003AFAA1 /* CustomNavBarPreferenceKey.swift */,
-			);
-			path = CustomNavBar;
 			sourceTree = "<group>";
 		};
 		29CE83812BCDB200003BB674 /* Model */ = {
@@ -331,14 +308,9 @@
 				298051CF2BCE3C0A003AFAA1 /* EditPasswordView.swift in Sources */,
 				29CE83842BCDB241003BB674 /* PasswordManager.swift in Sources */,
 				298051C92BCDD21B003AFAA1 /* PasswordListView.swift in Sources */,
-				298051C32BCDCE39003AFAA1 /* CustomNavBarView.swift in Sources */,
-				298051C52BCDCE42003AFAA1 /* CustomNavLink.swift in Sources */,
-				298051C72BCDCE4E003AFAA1 /* CustomNavBarPreferenceKey.swift in Sources */,
 				14E7CD1B2BCDA75A007053F2 /* ContentView.swift in Sources */,
 				14E7CD192BCDA75A007053F2 /* PasswordManagerApp.swift in Sources */,
-				298051C12BCDCE2D003AFAA1 /* CustomNavBarContainerView.swift in Sources */,
 				29CE838C2BCDBBB7003BB674 /* AddPasswordView.swift in Sources */,
-				298051BF2BCDCE22003AFAA1 /* CustomNavView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

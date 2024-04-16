@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct PasswordDetailView: View {
+  @Environment(\.dismiss) var dismiss
+
   var pwManager = PasswordManager.shared
   var pw: FetchedResults<Passwords>.Element
 
@@ -29,23 +31,38 @@ struct PasswordDetailView: View {
           }
       }
 
-			CustomNavLink(destination: EditPasswordView(pw: pw), isActive: $showEditView) {
+			NavigationLink(destination: EditPasswordView(pw: pw), isActive: $showEditView) {
         EmptyView()
       }
 
       Spacer()
     }
     .padding()
-		.customNavigationTitle(pw.title!)
+    .navigationTitle(pw.title!)
 		.toolbar {
-			ToolbarItem(placement: .navigationBarTrailing) {
+			ToolbarItem(placement: .topBarTrailing) {
 				Button {
 					showEditView.toggle()
 				} label: {
 					Label("Edit", systemImage: "edit")
 				}
 			}
+
+      ToolbarItem(placement: .topBarLeading) {
+        Button {
+          dismiss()
+        } label: {
+          HStack {
+            Image(systemName: "chevron.left")
+            Text("Back")
+          }
+        }
+      }
 		}
+    .toolbarBackground(.orange, for: .navigationBar)
+    .toolbarBackground(.visible, for: .navigationBar)
+    .toolbarColorScheme(.dark, for: .navigationBar)
+    .navigationBarBackButtonHidden()
   }
 }
 
