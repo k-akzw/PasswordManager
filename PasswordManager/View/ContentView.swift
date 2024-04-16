@@ -42,8 +42,16 @@ struct ContentView: View {
         Spacer()
       }
       .padding()
-      .customNavBarItems(title: "Password", backButtonHidden: true, showHideKeyboardButton: true)
-    } action: {}
+			.toolbar {
+				ToolbarItem(placement: .navigationBarTrailing) {
+					Button {
+					} label: {
+						Label("Add View", systemImage: "plus.circle")
+					}
+				}
+			}
+			.customNavigationTitle("Password")
+    }
   }
 }
 

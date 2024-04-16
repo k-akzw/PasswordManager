@@ -36,7 +36,7 @@ struct PasswordDetailView: View {
       Spacer()
     }
     .padding()
-    .customNavBarItems(title: pw.title!)
+		.customNavigationTitle(pw.title!)
 		.toolbar {
 			ToolbarItem(placement: .navigationBarTrailing) {
 				Button {

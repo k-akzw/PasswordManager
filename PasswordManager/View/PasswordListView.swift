@@ -49,9 +49,6 @@ struct PasswordListView: View {
 
       Spacer()
     }
-    .customNavBarItems(title: "Password List", backButtonHidden: true, showAddButton: false, buttonName: "plus.circle") {
-      showAddView = true
-    }
 		.toolbar {
 			ToolbarItem(placement: .navigationBarTrailing) {
 				Button {
@@ -61,6 +58,7 @@ struct PasswordListView: View {
 				}
 			}
 		}
+		.customNavigationTitle("Password List")
   }
 
   private func deletePassword(offsets: IndexSet) {

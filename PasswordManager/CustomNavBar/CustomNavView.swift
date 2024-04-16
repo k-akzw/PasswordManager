@@ -10,11 +10,9 @@ import SwiftUI
 struct CustomNavView<Content: View>: View {
 
   let content: Content
-  let action: () -> Void
 
-  init(@ViewBuilder content: () -> Content, action: @escaping () -> Void) {
+  init(@ViewBuilder content: () -> Content) {
     self.content = content()
-    self.action = action
   }
 
   var body: some View {
