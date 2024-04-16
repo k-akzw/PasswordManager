@@ -10,9 +10,6 @@ import SwiftUI
 struct PasswordDetailView: View {
   var pwManager = PasswordManager.shared
   var pw: FetchedResults<Passwords>.Element
-//  var title: String
-//  var username: String
-//  var password: String
 
   @State var hidePassword = true
   @State var showEditView = false
@@ -32,7 +29,7 @@ struct PasswordDetailView: View {
           }
       }
 
-      CustomNavLink(destination: EditPasswordView(username: pw.username!), isActive: $showEditView) {
+			CustomNavLink(destination: EditPasswordView(pw: pw), isActive: $showEditView) {
         EmptyView()
       }
 

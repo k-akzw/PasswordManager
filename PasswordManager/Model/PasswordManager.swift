@@ -64,6 +64,11 @@ class PasswordManager {
     guard let password = encrypt(pw.password) else { return }
     DataController().addPassword(title: pw.title, username: pw.username, password: password, context: context)
   }
+	
+	func editPassword(_ pw: Password, to passwords: Passwords, context: NSManagedObjectContext) {
+		guard let password = encrypt(pw.password) else { return }
+		DataController().editPassword(passwords, title: pw.title, username: pw.username, password: password, context: context)
+	}
 
   func getPassword(_ encryptedData: Data) -> String {
     guard let pw = decryptPassword(encryptedData) else { return "" }

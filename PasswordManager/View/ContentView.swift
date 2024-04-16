@@ -73,7 +73,7 @@ struct MasterPasswordView: View {
             Spacer()
             Image(systemName: "xmark.circle.fill")
               .padding()
-              .foregroundColor(Color.primary)
+              .foregroundColor(Color.secondary)
               .onTapGesture {
                 masterPassword = ""
               }
