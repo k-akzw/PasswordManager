@@ -41,8 +41,6 @@ struct PasswordListView: View {
       NavigationLink(destination: AddPasswordView(), isActive: $showAddView) {
         EmptyView()
       }
-
-      Spacer()
     }
     .navigationTitle("Password List")
 		.toolbar {

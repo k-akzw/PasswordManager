@@ -14,6 +14,7 @@ struct ContentView: View {
   private var pwManager = PasswordManager.shared
 
   @State var accessGranted = false
+  @State var showChangeView = false
 
   var body: some View {
     NavigationView {
@@ -33,9 +34,13 @@ struct ContentView: View {
         Spacer()
           .frame(height: 10)
 
-        MasterPasswordView(accessGranted: $accessGranted)
+        MasterPasswordView(accessGranted: $accessGranted, showChangeView: $showChangeView)
 
         NavigationLink(destination: PasswordListView(), isActive: $accessGranted) {
+          EmptyView()
+        }
+
+        NavigationLink(destination: ChangePasswordView(), isActive: $showChangeView) {
           EmptyView()
         }
 
@@ -57,6 +62,7 @@ struct MasterPasswordView: View {
   @State var pwEntered = false
 
   @Binding var accessGranted: Bool
+  @Binding var showChangeView: Bool
 
   var body: some View {
     if !pwManager.doesMasterPasswordExist() {
@@ -110,6 +116,15 @@ struct MasterPasswordView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .offset(x: 10)
         .opacity(!masterPassword.isEmpty && pwEntered ? 1 : 0)
+    }
+    if pwManager.doesMasterPasswordExist() {
+      Button {
+        showChangeView = true
+      } label: {
+        Text("Change Password")
+          .foregroundStyle(Color.blue)
+          .underline()
+      }
     }
   }
 }

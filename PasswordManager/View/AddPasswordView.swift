@@ -51,6 +51,7 @@ struct AddPasswordView: View {
         } label: {
           Label("Done", systemImage: "done")
         }
+        .disabled(title.isEmpty || username.isEmpty || password.isEmpty)
       }
     }
     .padding()

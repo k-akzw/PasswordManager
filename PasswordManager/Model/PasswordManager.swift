@@ -18,7 +18,7 @@ struct Password {
 class PasswordManager {
   static let shared = PasswordManager()
 
-  private let masterPasswordKey = "Master Password"
+  private let masterPwKey = "Master Password"
   private let symmetricKey = "Symmetric Key"
   private var key = SymmetricKey(size: .bits256)
 
@@ -48,26 +48,33 @@ class PasswordManager {
   // MARK: - Public Functions
 
   func setMasterPassword(_ pw: String) {
-    UserDefaults.standard.set(hashPassword(pw), forKey: masterPasswordKey)
+    UserDefaults.standard.set(hashPassword(pw), forKey: masterPwKey)
   }
 
   func doesMasterPasswordExist() -> Bool {
-    return UserDefaults.standard.string(forKey: masterPasswordKey) != nil
+    return UserDefaults.standard.string(forKey: masterPwKey) != nil
   }
 
   func doesMasterPasswordMatch(_ pw: String) -> Bool {
-    guard let masterPassword = UserDefaults.standard.string(forKey: masterPasswordKey) else { return false }
-    return hashPassword(pw) == masterPassword
+    guard let masterPw = UserDefaults.standard.string(forKey: masterPwKey) else { return false }
+    return hashPassword(pw) == masterPw
   }
 
   func addPassword(_ pw: Password, context: NSManagedObjectContext) {
     guard let password = encrypt(pw.password) else { return }
-    DataController().addPassword(title: pw.title, username: pw.username, password: password, context: context)
+    DataController().addPassword(title: pw.title, 
+                                 username: pw.username,
+                                 password: password,
+                                 context: context)
   }
 	
 	func editPassword(_ pw: Password, to passwords: Passwords, context: NSManagedObjectContext) {
 		guard let password = encrypt(pw.password) else { return }
-		DataController().editPassword(passwords, title: pw.title, username: pw.username, password: password, context: context)
+		DataController().editPassword(passwords, 
+                                  title: pw.title,
+                                  username: pw.username,
+                                  password: password,
+                                  context: context)
 	}
 
   func getPassword(_ encryptedData: Data) -> String {

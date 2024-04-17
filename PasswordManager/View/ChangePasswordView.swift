@@ -1,0 +1,68 @@
+//
+//  ChangePasswordView.swift
+//  PasswordManager
+//
+//  Created by Kento Akazawa on 4/16/24.
+//
+
+import SwiftUI
+
+struct ChangePasswordView: View {
+  @Environment(\.dismiss) var dismiss
+
+  private var pwManager = PasswordManager.shared
+  @State private var curPw = ""
+  @State private var newPw = ""
+  @State private var pwEntered = false
+  @State private var wrongPw = false
+
+  var body: some View {
+    VStack {
+      TextFieldView(title: "Current Password", showFooter: false, text: $curPw, pwEntered: $pwEntered)
+      TextFieldView(title: "New Password", showFooter: true, text: $newPw, pwEntered: $pwEntered)
+
+      Text("Wrong Password")
+        .bold()
+        .foregroundStyle(Color.red)
+        .opacity(wrongPw ? 1 : 0)
+
+      Spacer()
+    }
+    .padding()
+    .toolbar {
+      ToolbarItem(placement: .topBarTrailing) {
+        Button {
+          if pwManager.doesMasterPasswordMatch(curPw) {
+            pwManager.setMasterPassword(newPw)
+            dismiss()
+          } else {
+            wrongPw = true
+          }
+        } label: {
+          Label("Save", systemImage: "save")
+        }
+        .disabled(curPw.isEmpty || newPw.isEmpty)
+      }
+
+      ToolbarItem(placement: .topBarLeading) {
+        Button {
+          dismiss()
+        } label: {
+          HStack {
+            Image(systemName: "chevron.left")
+            Text("Back")
+          }
+        }
+      }
+    }
+    .toolbarBackground(.orange, for: .navigationBar)
+    .toolbarBackground(.visible, for: .navigationBar)
+    .toolbarColorScheme(.dark, for: .navigationBar)
+    .navigationBarBackButtonHidden()
+  }
+  
+}
+
+//#Preview {
+//    ChangePasswordView()
+//}
