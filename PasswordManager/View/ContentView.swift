@@ -51,6 +51,7 @@ struct ContentView: View {
       .navigationBarTitleDisplayMode(.inline)
       .toolbarBackground(.orange, for: .navigationBar)
       .toolbarBackground(.visible, for: .navigationBar)
+			// make foreground color of title to white
       .toolbarColorScheme(.dark, for: .navigationBar)
     }
   }
@@ -65,6 +66,8 @@ struct MasterPasswordView: View {
   @Binding var showChangeView: Bool
 
   var body: some View {
+		// if master password has not been set
+		// display text "Set Password"
     if !pwManager.doesMasterPasswordExist() {
       Text("Set Password")
         .font(.subheadline)
@@ -79,6 +82,7 @@ struct MasterPasswordView: View {
         .background(Color(.systemGray6))
         .cornerRadius(10)
         .overlay {
+					// button to delete entered text
           HStack {
             Spacer()
             Image(systemName: "xmark.circle.fill")
@@ -100,6 +104,9 @@ struct MasterPasswordView: View {
           }
         })
         .onSubmit {
+					// if master password has been set
+					// check if it matches saved password
+					// otherwise set entered text as master password
           if pwManager.doesMasterPasswordExist() {
             accessGranted = pwManager.doesMasterPasswordMatch(masterPassword)
             if !accessGranted {
@@ -117,6 +124,8 @@ struct MasterPasswordView: View {
         .offset(x: 10)
         .opacity(!masterPassword.isEmpty && pwEntered ? 1 : 0)
     }
+		// if master password has been set
+		// allow user to change password
     if pwManager.doesMasterPasswordExist() {
       Button {
         showChangeView = true

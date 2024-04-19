@@ -20,6 +20,7 @@ struct PasswordDetailView: View {
     VStack {
       TextView(title: "Username", text: pw.username!)
       if hidePassword {
+				// display password as "●"
         TextView(title: "Password", text: String(repeating: "●", count: pwManager.getPassword(pw.password!).count))
           .onTapGesture {
             hidePassword = false
@@ -40,6 +41,17 @@ struct PasswordDetailView: View {
     .padding()
     .navigationTitle(pw.title!)
 		.toolbar {
+			ToolbarItem(placement: .topBarLeading) {
+				Button {
+					dismiss()
+				} label: {
+					HStack {
+						Image(systemName: "chevron.left")
+						Text("Back")
+					}
+				}
+			}
+			
 			ToolbarItem(placement: .topBarTrailing) {
 				Button {
 					showEditView.toggle()
@@ -47,17 +59,6 @@ struct PasswordDetailView: View {
 					Label("Edit", systemImage: "edit")
 				}
 			}
-
-      ToolbarItem(placement: .topBarLeading) {
-        Button {
-          dismiss()
-        } label: {
-          HStack {
-            Image(systemName: "chevron.left")
-            Text("Back")
-          }
-        }
-      }
 		}
     .toolbarBackground(.orange, for: .navigationBar)
     .toolbarBackground(.visible, for: .navigationBar)
@@ -80,6 +81,7 @@ struct TextView: View {
         .offset(x: 10)
       Spacer()
     }
+		
     Text(text)
       .padding()
       .opacity(0.7)
@@ -87,6 +89,7 @@ struct TextView: View {
       .background(Color(.systemGray6))
       .cornerRadius(10)
       .overlay {
+				// copies entered text
         HStack {
           Spacer()
           Image(systemName: "doc")

@@ -29,6 +29,7 @@ struct AddPasswordView: View {
       Spacer()
     }
     .toolbar {
+			// back button to go back to previous screen
       ToolbarItem(placement: .topBarLeading) {
         Button {
           dismiss()
@@ -40,8 +41,10 @@ struct AddPasswordView: View {
         }
       }
 
+			// saves new password
       ToolbarItem(placement: .topBarTrailing) {
         Button {
+					// only save if all entries are entered
           if title.isEmpty || username.isEmpty || password.isEmpty {
             pwEntered = true
           } else {

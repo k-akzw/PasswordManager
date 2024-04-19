@@ -16,13 +16,21 @@ struct Password {
 }
 
 class PasswordManager {
+	// singleton instance of this class
   static let shared = PasswordManager()
 
+	// keys for UserDefaults
+	// used to get master password and symmetric key
   private let masterPwKey = "Master Password"
   private let symmetricKey = "Symmetric Key"
+	// symmetric key used for encryption
   private var key = SymmetricKey(size: .bits256)
 
+	// MARK: - Initialization
+	
   init() {
+		// if the symmetric key has already been generated, assign it to @key
+		// otherwise, create new key and save it to UserDefaults
     if let keyData = UserDefaults.standard.data(forKey: symmetricKey) {
       do {
         key = try SymmetricKey(data: keyData)
@@ -47,20 +55,30 @@ class PasswordManager {
 
   // MARK: - Public Functions
 
+	// set the master password
   func setMasterPassword(_ pw: String) {
+		// hash the password before saving
     UserDefaults.standard.set(hashPassword(pw), forKey: masterPwKey)
   }
 
+	// checks if master password has already been set
   func doesMasterPasswordExist() -> Bool {
+		// master password is saved in UserDefaults
     return UserDefaults.standard.string(forKey: masterPwKey) != nil
   }
 
+	// checks if master password saved in UserDefaults matches @pw
   func doesMasterPasswordMatch(_ pw: String) -> Bool {
+		// get master password from UserDefault
     guard let masterPw = UserDefaults.standard.string(forKey: masterPwKey) else { return false }
+		// since master password is saved after being hashed
+		// compare @pw after hashing
     return hashPassword(pw) == masterPw
   }
 
+	// add @pw to the database after encryption
   func addPassword(_ pw: Password, context: NSManagedObjectContext) {
+		// encrypting
     guard let password = encrypt(pw.password) else { return }
     DataController().addPassword(title: pw.title, 
                                  username: pw.username,
@@ -68,7 +86,9 @@ class PasswordManager {
                                  context: context)
   }
 	
+	// edit @pw in the database after encryption
 	func editPassword(_ pw: Password, to passwords: Passwords, context: NSManagedObjectContext) {
+		// encrypting
 		guard let password = encrypt(pw.password) else { return }
 		DataController().editPassword(passwords, 
                                   title: pw.title,
@@ -77,14 +97,18 @@ class PasswordManager {
                                   context: context)
 	}
 
+	// decrypts @encryptedData and return the original password as string
   func getPassword(_ encryptedData: Data) -> String {
+		// decryting
     guard let pw = decryptPassword(encryptedData) else { return "" }
     return pw
   }
 
   // MARK: - Private Functions
 
+	// hash @pw using SHA-256
   private func hashPassword(_ pw: String) -> String {
+		// convert string to data
     guard let passwordData = pw.data(using: .utf8) else {
       fatalError("Failed to convert password to data")
     }
@@ -94,7 +118,9 @@ class PasswordManager {
     return SHA256.hash(data: passwordData).map { String(format: "%02x", $0) }.joined()
   }
 
+	// encrypts @pw and return encrypted password as Data
   private func encrypt(_ pw: String) -> Data? {
+		// converts the password string to data using UTF8
     guard let data = pw.data(using: .utf8) else { return nil }
     do {
       let sealedBox = try AES.GCM.seal(data, using: key)
@@ -105,10 +131,13 @@ class PasswordManager {
     }
   }
 
+	// decrypts @encryptedData and return password as string
   private func decryptPassword(_ encryptedData: Data) -> String? {
     do {
+			// decrypts using AES-GCM algorithm
       let sealedBox = try AES.GCM.SealedBox(combined: encryptedData)
       let decryptedData = try AES.GCM.open(sealedBox, using: key)
+			// converts data to string using UTF8
       return String(data: decryptedData, encoding: .utf8)
     } catch {
       print("Decryption failed: \(error.localizedDescription)")

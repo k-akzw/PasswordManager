@@ -36,6 +36,17 @@ struct EditPasswordView: View {
       password = pwManager.getPassword(pw.password!)
     }
     .toolbar {
+			ToolbarItem(placement: .topBarLeading) {
+				Button {
+					dismiss()
+				} label: {
+					HStack {
+						Image(systemName: "chevron.left")
+						Text("Back")
+					}
+				}
+			}
+			
       ToolbarItem(placement: .topBarTrailing) {
         Button {
           if title.isEmpty || username.isEmpty || password.isEmpty {
@@ -48,17 +59,6 @@ struct EditPasswordView: View {
           Label("Done", systemImage: "done")
         }
         .disabled(title.isEmpty || username.isEmpty || password.isEmpty)
-      }
-
-      ToolbarItem(placement: .topBarLeading) {
-        Button {
-          dismiss()
-        } label: {
-          HStack {
-            Image(systemName: "chevron.left")
-            Text("Back")
-          }
-        }
       }
     }
     .toolbarBackground(.orange, for: .navigationBar)
@@ -85,6 +85,7 @@ struct TextFieldView: View {
           .offset(x: 10)
         Spacer()
       }
+			
       TextField("", text: $text)
         .padding()
         .opacity(0.7)

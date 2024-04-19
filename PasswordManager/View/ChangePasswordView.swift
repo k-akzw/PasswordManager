@@ -30,8 +30,22 @@ struct ChangePasswordView: View {
     }
     .padding()
     .toolbar {
+			// back button to go back to previous screen
+			ToolbarItem(placement: .topBarLeading) {
+				Button {
+					dismiss()
+				} label: {
+					HStack {
+						Image(systemName: "chevron.left")
+						Text("Back")
+					}
+				}
+			}
+			
       ToolbarItem(placement: .topBarTrailing) {
         Button {
+					// if current password is correct
+					// set new password and go back to ContentView
           if pwManager.doesMasterPasswordMatch(curPw) {
             pwManager.setMasterPassword(newPw)
             dismiss()
@@ -42,17 +56,6 @@ struct ChangePasswordView: View {
           Label("Save", systemImage: "save")
         }
         .disabled(curPw.isEmpty || newPw.isEmpty)
-      }
-
-      ToolbarItem(placement: .topBarLeading) {
-        Button {
-          dismiss()
-        } label: {
-          HStack {
-            Image(systemName: "chevron.left")
-            Text("Back")
-          }
-        }
       }
     }
     .toolbarBackground(.orange, for: .navigationBar)
