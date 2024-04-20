@@ -159,8 +159,8 @@
 				14E7CD1A2BCDA75A007053F2 /* ContentView.swift */,
 				29B82BEA2BCF027700FE1FFB /* ChangePasswordView.swift */,
 				298051C82BCDD21B003AFAA1 /* PasswordListView.swift */,
-				29CE838B2BCDBBB7003BB674 /* AddPasswordView.swift */,
 				298051CA2BCE0DFF003AFAA1 /* PasswordDetailView.swift */,
+				29CE838B2BCDBBB7003BB674 /* AddPasswordView.swift */,
 				298051CE2BCE3C0A003AFAA1 /* EditPasswordView.swift */,
 			);
 			path = View;

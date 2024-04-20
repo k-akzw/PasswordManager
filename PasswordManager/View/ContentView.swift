@@ -17,7 +17,7 @@ struct ContentView: View {
   @State var showChangeView = false
 
   var body: some View {
-    NavigationView {
+    NavigationStack {
       VStack {
         Spacer()
 
@@ -36,16 +36,14 @@ struct ContentView: View {
 
         MasterPasswordView(accessGranted: $accessGranted, showChangeView: $showChangeView)
 
-        NavigationLink(destination: PasswordListView(), isActive: $accessGranted) {
-          EmptyView()
-        }
-
-        NavigationLink(destination: ChangePasswordView(), isActive: $showChangeView) {
-          EmptyView()
-        }
-
         Spacer()
       }
+      .navigationDestination(isPresented: $accessGranted, destination: {
+        PasswordListView()
+      })
+      .navigationDestination(isPresented: $showChangeView, destination: {
+        ChangePasswordView()
+      })
       .padding()
       .navigationTitle("Password")
       .navigationBarTitleDisplayMode(.inline)

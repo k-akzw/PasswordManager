@@ -15,29 +15,48 @@ struct PasswordDetailView: View {
 
   @State var hidePassword = true
   @State var showEditView = false
+  @State private var showCopy = false
 
   var body: some View {
-    VStack {
-      TextView(title: "Username", text: pw.username!)
-      if hidePassword {
-				// display password as "●"
-        TextView(title: "Password", text: String(repeating: "●", count: pwManager.getPassword(pw.password!).count))
-          .onTapGesture {
-            hidePassword = false
+    ZStack {
+      VStack {
+        TextView(title: "Username", 
+                 text: pw.username!,
+                 showCopy: $showCopy)
+        if hidePassword {
+          // display password as "●"
+          TextView(title: "Password", 
+                   text: String(repeating: "●", 
+                                count: pwManager.getPassword(pw.password!).count),
+                   showCopy: $showCopy)
+            .onTapGesture {
+              hidePassword = false
+            }
+        } else {
+          TextView(title: "Password",
+                   text: pwManager.getPassword(pw.password!),
+                   showCopy: $showCopy)
+            .onTapGesture {
+              hidePassword = true
+            }
+        }
+
+        Spacer()
+      }
+      .onChange(of: showCopy) { _, newVal in
+        if newVal {
+          // show copy popup view for a second
+          DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            showCopy = false
           }
-      } else {
-        TextView(title: "Password", text: pwManager.getPassword(pw.password!))
-          .onTapGesture {
-            hidePassword = true
-          }
+        }
       }
 
-			NavigationLink(destination: EditPasswordView(pw: pw), isActive: $showEditView) {
-        EmptyView()
-      }
-
-      Spacer()
+      PopupView(text: "Text Copied", show: $showCopy)
     }
+    .navigationDestination(isPresented: $showEditView, destination: {
+      EditPasswordView(pw: pw)
+    })
     .padding()
     .navigationTitle(pw.title!)
 		.toolbar {
@@ -54,7 +73,7 @@ struct PasswordDetailView: View {
 			
 			ToolbarItem(placement: .topBarTrailing) {
 				Button {
-					showEditView.toggle()
+					showEditView = true
 				} label: {
 					Label("Edit", systemImage: "edit")
 				}
@@ -70,6 +89,7 @@ struct PasswordDetailView: View {
 struct TextView: View {
   var title: String
   var text: String
+  @Binding var showCopy: Bool
 
   var body: some View {
     HStack {
@@ -90,16 +110,37 @@ struct TextView: View {
       .cornerRadius(10)
       .overlay {
 				// copies entered text
-        HStack {
-          Spacer()
-          Image(systemName: "doc")
-            .padding()
-            .opacity(0.5)
-            .onTapGesture {
-              UIPasteboard.general.string = text
-            }
+        if !text.contains("●") {
+          HStack {
+            Spacer()
+            Image(systemName: "doc")
+              .padding()
+              .opacity(0.5)
+              .onTapGesture {
+                showCopy = true
+                UIPasteboard.general.string = text
+              }
+          }
         }
       }
+  }
+}
+
+struct PopupView: View {
+  var text: String
+  @Binding var show: Bool
+
+  var body: some View {
+    VStack {
+      Spacer()
+      Text("Text Copied")
+        .padding()
+        .frame(width: 280, alignment: .center)
+        .foregroundStyle(Color.white)
+        .background(Color(.orange))
+        .cornerRadius(12)
+    }
+    .opacity(show ? 1 : 0)
   }
 }
 

@@ -37,11 +37,10 @@ struct PasswordListView: View {
         }
         .onDelete(perform: deletePassword)
       }
-
-      NavigationLink(destination: AddPasswordView(), isActive: $showAddView) {
-        EmptyView()
-      }
     }
+    .navigationDestination(isPresented: $showAddView, destination: {
+      AddPasswordView()
+    })
     .navigationTitle("Password List")
 		.toolbar {
 			ToolbarItem(placement: .navigationBarTrailing) {

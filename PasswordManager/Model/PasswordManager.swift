@@ -33,23 +33,13 @@ class PasswordManager {
 		// if the symmetric key has already been generated, assign it to @key
 		// otherwise, create new key and save it to UserDefaults
 		if let keyData = UserDefaults.standard.data(forKey: symmetricKey) {
-			do {
-				key = try SymmetricKey(data: keyData)
-			} catch {
-				// error initializing symmetric key from data
-				print("Error initializing SymmetricKey from data:", error)
-			}
+      key = SymmetricKey(data: keyData)
 		} else {
 			// generate symmetric key if it doesn't exist yet
 			key = SymmetricKey(size: .bits256)
-			do {
-				// convert symmetric key to Data and store in UserDefaults
-				let keyData = try key.withUnsafeBytes { Data($0) }
-				UserDefaults.standard.set(keyData, forKey: symmetricKey)
-			} catch {
-				// error converting symmetric key to data
-				print("Error converting SymmetricKey to data:", error)
-			}
+      // convert symmetric key to Data and store in UserDefaults
+      let keyData = key.withUnsafeBytes { Data($0) }
+      UserDefaults.standard.set(keyData, forKey: symmetricKey)
 		}
 	}
 	
@@ -194,8 +184,10 @@ class PasswordManager {
 	private func encrypt(_ pw: String) -> Data? {
 		// add salt and converts the password string to data using UTF8
 		guard let data = (pw + getSalt()).data(using: .utf8) else { return nil }
+    print("Before encryption - \(String(describing: String(data: data, encoding: .utf8)))")
 		do {
 			let sealedBox = try AES.GCM.seal(data, using: key)
+      print("After encryption - \(String(describing: String(data: sealedBox.combined ?? Data(), encoding: .utf8)))")
 			return sealedBox.combined
 		} catch {
 			print("Encryption failed: \(error.localizedDescription)")
@@ -206,12 +198,15 @@ class PasswordManager {
 	// decrypts @encryptedData and return password as string
 	private func decryptPassword(_ encryptedData: Data) -> String? {
 		do {
+      print("Before decryption - \(String(describing: String(data: encryptedData, encoding: .utf8)))")
 			// decrypts using AES-GCM algorithm
 			let sealedBox = try AES.GCM.SealedBox(combined: encryptedData)
 			let decryptedData = try AES.GCM.open(sealedBox, using: key)
 			// converts data to string using UTF8
-			let decrypted = String(data: decryptedData, encoding: .utf8)
-			return String(decrypted!.dropLast(saltLength))
+			let pw = String(data: decryptedData, encoding: .utf8)
+      print("After decryption - \(String(describing: pw))")
+      // remove salt
+			return String(pw!.dropLast(saltLength))
 		} catch {
 			print("Decryption failed: \(error.localizedDescription)")
 			return nil
