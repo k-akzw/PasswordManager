@@ -151,6 +151,7 @@ struct TextFieldView: View {
               }
           }
         }
+        .autocorrectionDisabled()
         .onChange(of: text) { _, newVal in
           // when user deletes the wrong password previously entered
           // reset @passwordEntered
