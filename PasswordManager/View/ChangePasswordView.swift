@@ -63,7 +63,6 @@ struct ChangePasswordView: View {
     .toolbarColorScheme(.dark, for: .navigationBar)
     .navigationBarBackButtonHidden()
   }
-  
 }
 
 //#Preview {

@@ -18,22 +18,68 @@ struct EditPasswordView: View {
   @State private var username = ""
   @State private var password = ""
   @State private var pwEntered = false
+	@State private var strongPassword = ""
+	@State private var showCopy = false
+	@State private var pwStrength = 0
 
   var body: some View {
-    VStack {
-      TextFieldView(title: "Title", showFooter: true, text: $title, pwEntered: $pwEntered)
-      Divider()
-      TextFieldView(title: "Username", showFooter: true, text: $username, pwEntered: $pwEntered)
-      Divider()
-      TextFieldView(title: "Password", showFooter: true, text: $password, pwEntered: $pwEntered)
-
-      Spacer()
-    }
+		ZStack {
+			VStack {
+				TextFieldView(title: "Title", showFooter: true, text: $title, pwEntered: $pwEntered)
+				Divider()
+				TextFieldView(title: "Username", showFooter: true, text: $username, pwEntered: $pwEntered)
+				Divider()
+				TextFieldView(title: "Password", showFooter: true, text: $password, pwEntered: $pwEntered, pwStrength: pwStrength)
+				
+				HStack {
+					Text("Recommended Password")
+						.font(.subheadline)
+						.bold()
+						.opacity(0.5)
+						.frame(maxWidth: .infinity, alignment: .leading)
+						.offset(x: 10)
+					Spacer()
+				}
+				Text(strongPassword)
+					.frame(maxWidth: .infinity, alignment: .leading)
+					.offset(x: 10)
+					.onLongPressGesture {
+						showCopy = true
+						UIPasteboard.general.string = strongPassword
+					}
+					.onChange(of: showCopy, { _, newVal in
+						if newVal {
+							password = strongPassword
+							DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+								showCopy = false
+							}
+						}
+					})
+				
+				Spacer()
+			}
+			
+			// popup view to let the user know that strong password is copied
+			VStack {
+				Spacer()
+				Text("Text Copied")
+					.padding()
+					.frame(width: 280, alignment: .center)
+					.foregroundStyle(Color.white)
+					.background(Color(.orange))
+					.cornerRadius(12)
+			}
+			.opacity(showCopy ? 1 : 0)
+		}
     .padding()
+		.onChange(of: password, { _, _ in
+			pwStrength = pwManager.getPasswordStrength(password)
+		})
     .onAppear {
       title = pw.title!
       username = pw.username!
       password = pwManager.getPassword(pw.password!)
+			strongPassword = pwManager.generatePassword(length: 12)
     }
     .toolbar {
 			ToolbarItem(placement: .topBarLeading) {
@@ -56,7 +102,7 @@ struct EditPasswordView: View {
             dismiss()
           }
         } label: {
-          Label("Done", systemImage: "done")
+          Text("Done")
         }
         .disabled(title.isEmpty || username.isEmpty || password.isEmpty)
       }
@@ -73,6 +119,7 @@ struct TextFieldView: View {
   var showFooter: Bool
   @Binding var text: String
   @Binding var pwEntered: Bool
+	var pwStrength: Int?
 
   var body: some View {
     Section {
@@ -87,6 +134,7 @@ struct TextFieldView: View {
       }
 			
       TextField("", text: $text)
+				.autocapitalization(.none)
         .padding()
         .opacity(0.7)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -113,6 +161,13 @@ struct TextFieldView: View {
           }
         }
     } footer: {
+			if let pwStrength = pwStrength {
+				ProgressView(value: Double(pwStrength), total: 5.0)
+					.scaleEffect(x: 1.0, y: 2.5)
+					.tint(getColor(pwStrength: pwStrength))
+					.cornerRadius(0.2)
+			}
+			
       Text("This field cannot be empty. ")
         .foregroundStyle(.red)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -121,6 +176,23 @@ struct TextFieldView: View {
         .padding(0)
     }
   }
+	
+	private func getColor(pwStrength: Int) -> Color{
+		switch pwStrength {
+		case 1:
+			return Color.red
+		case 2:
+			return Color.init(red: 1, green: 0.5, blue: 0)
+		case 3:
+			return Color.yellow
+		case 4:
+			return Color.init(red: 0.5, green: 1, blue: 0.5)
+		case 5:
+			return Color.green
+		default:
+			return Color.white
+		}
+	}
 }
 
 //#Preview {
