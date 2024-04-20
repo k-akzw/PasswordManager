@@ -45,4 +45,10 @@ class DataController: ObservableObject {
 
     save(context: context)
   }
+
+  func deletePassword(_ pw: Passwords, context: NSManagedObjectContext) {
+    context.delete(pw)
+
+    save(context: context)
+  }
 }

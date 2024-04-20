@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct PasswordDetailView: View {
+  @Environment(\.managedObjectContext) var managedObjContext
   @Environment(\.dismiss) var dismiss
 
   var pwManager = PasswordManager.shared
@@ -16,38 +17,61 @@ struct PasswordDetailView: View {
   @State var hidePassword = true
   @State var showEditView = false
   @State private var showCopy = false
+  @State private var showAlert = false
 
   var body: some View {
     ZStack {
-      VStack {
-        TextView(title: "Username", 
-                 text: pw.username!,
-                 showCopy: $showCopy)
-        if hidePassword {
-          // display password as "●"
-          TextView(title: "Password", 
-                   text: String(repeating: "●", 
-                                count: pwManager.getPassword(pw.password!).count),
+      if pw.id != nil {
+        VStack {
+          TextView(title: "Username",
+                   text: pw.username!,
                    showCopy: $showCopy)
+          if hidePassword {
+            // display password as "●"
+            TextView(title: "Password",
+                     text: String(repeating: "●",
+                                  count: pwManager.getPassword(pw.password!).count),
+                     showCopy: $showCopy)
             .onTapGesture {
               hidePassword = false
             }
-        } else {
-          TextView(title: "Password",
-                   text: pwManager.getPassword(pw.password!),
-                   showCopy: $showCopy)
+          } else {
+            TextView(title: "Password",
+                     text: pwManager.getPassword(pw.password!),
+                     showCopy: $showCopy)
             .onTapGesture {
               hidePassword = true
             }
-        }
+          }
 
-        Spacer()
-      }
-      .onChange(of: showCopy) { _, newVal in
-        if newVal {
-          // show copy popup view for a second
-          DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            showCopy = false
+          Spacer()
+
+          Button {
+            showAlert = true
+          } label: {
+            Text("Delete Password")
+              .opacity(0.7)
+              .frame(width: 280, height: 50, alignment: .center)
+              .foregroundStyle(Color.red)
+              .background(Color(.systemGray6))
+              .cornerRadius(10)
+              .alert("Are you sure?", isPresented: $showAlert) {
+                Button("Cancel", role: .cancel) { }
+                Button("Delete", role: .destructive) {
+                  dismiss()
+                  DataController().deletePassword(pw, context: managedObjContext)
+                }
+              } message: {
+                Text("Are you sure you want to delete the password?")
+              }
+          }
+        }
+        .onChange(of: showCopy) { _, newVal in
+          if newVal {
+            // show copy popup view for a second
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+              showCopy = false
+            }
           }
         }
       }
@@ -58,27 +82,27 @@ struct PasswordDetailView: View {
       EditPasswordView(pw: pw)
     })
     .padding()
-    .navigationTitle(pw.title!)
-		.toolbar {
-			ToolbarItem(placement: .topBarLeading) {
-				Button {
-					dismiss()
-				} label: {
-					HStack {
-						Image(systemName: "chevron.left")
-						Text("Back")
-					}
-				}
-			}
-			
-			ToolbarItem(placement: .topBarTrailing) {
-				Button {
-					showEditView = true
-				} label: {
-					Label("Edit", systemImage: "edit")
-				}
-			}
-		}
+    .navigationTitle(pw.title ?? "")
+    .toolbar {
+      ToolbarItem(placement: .topBarLeading) {
+        Button {
+          dismiss()
+        } label: {
+          HStack {
+            Image(systemName: "chevron.left")
+            Text("Back")
+          }
+        }
+      }
+
+      ToolbarItem(placement: .topBarTrailing) {
+        Button {
+          showEditView = true
+        } label: {
+          Text("Edit")
+        }
+      }
+    }
     .toolbarBackground(.orange, for: .navigationBar)
     .toolbarBackground(.visible, for: .navigationBar)
     .toolbarColorScheme(.dark, for: .navigationBar)
@@ -101,7 +125,7 @@ struct TextView: View {
         .offset(x: 10)
       Spacer()
     }
-		
+
     Text(text)
       .padding()
       .opacity(0.7)
@@ -109,7 +133,7 @@ struct TextView: View {
       .background(Color(.systemGray6))
       .cornerRadius(10)
       .overlay {
-				// copies entered text
+        // copies entered text
         if !text.contains("●") {
           HStack {
             Spacer()

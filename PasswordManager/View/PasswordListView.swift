@@ -9,60 +9,78 @@ import SwiftUI
 
 struct PasswordListView: View {
   @Environment(\.managedObjectContext) var managedObjContext
+  @Environment(\.dismiss) var dismiss
   @FetchRequest(sortDescriptors: [SortDescriptor(\Passwords.title)]) var pw: FetchedResults<Passwords>
 
   private var pwManager = PasswordManager.shared
 
   @State private var username = ""
   @State private var showAddView = false
+  @State private var showAlert = false
+  @State private var pwToDelete = [Passwords]()
 
   var body: some View {
     VStack {
-      List {
-        ForEach(pw) { pw in
-          NavigationLink(destination: PasswordDetailView(pw: pw)) {
-            VStack {
-              Text(pw.title!)
-                .font(.subheadline)
-                .bold()
-                .opacity(0.8)
-                .frame(maxWidth: .infinity, alignment: .leading)
+      if pw.isEmpty {
+        Text("There are no passwords saved.")
+          .padding()
+          .bold()
+          .opacity(0.7)
+        Spacer()
+      } else {
+        List {
+          ForEach(pw) { pw in
+            NavigationLink(destination: PasswordDetailView(pw: pw)) {
+              VStack {
+                Text(pw.title!)
+                  .font(.subheadline)
+                  .bold()
+                  .opacity(0.8)
+                  .frame(maxWidth: .infinity, alignment: .leading)
 
-              Text(pw.username!)
-                .font(.footnote)
-                .opacity(0.5)
-                .frame(maxWidth: .infinity, alignment: .leading)
+                Text(pw.username!)
+                  .font(.footnote)
+                  .opacity(0.5)
+                  .frame(maxWidth: .infinity, alignment: .leading)
+              }
             }
           }
+          .onDelete(perform: showAlert)
         }
-        .onDelete(perform: deletePassword)
+        .alert("Are you sure?", isPresented: $showAlert) {
+          Button("Cancel", role: .cancel) { }
+          Button("Delete", role: .destructive) {
+            for pw in pwToDelete {
+              DataController().deletePassword(pw, context: managedObjContext)
+            }
+          }
+        } message: {
+          Text("Are you sure you want to delete the password?")
+        }
       }
     }
     .navigationDestination(isPresented: $showAddView, destination: {
       AddPasswordView()
     })
     .navigationTitle("Password List")
-		.toolbar {
-			ToolbarItem(placement: .navigationBarTrailing) {
-				Button {
-					showAddView.toggle()
-				} label: {
-					Label("Add", systemImage: "plus.circle")
-				}
-			}
-		}
+    .toolbar {
+      ToolbarItem(placement: .navigationBarTrailing) {
+        Button {
+          showAddView.toggle()
+        } label: {
+          Label("Add", systemImage: "plus.circle")
+        }
+      }
+    }
     .toolbarBackground(.orange, for: .navigationBar)
     .toolbarBackground(.visible, for: .navigationBar)
     .toolbarColorScheme(.dark, for: .navigationBar)
     .navigationBarBackButtonHidden()
   }
 
-  private func deletePassword(offsets: IndexSet) {
-    withAnimation {
-      offsets.map { pw[$0] }.forEach(managedObjContext.delete)
-
-      DataController().save(context: managedObjContext)
-    }
+  private func showAlert(offsets: IndexSet) {
+    pwToDelete = offsets.map{ pw[$0] }
+    showAlert = true
   }
 }
 
