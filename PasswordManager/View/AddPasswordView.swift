@@ -16,6 +16,8 @@ struct AddPasswordView: View {
 	@State private var title = ""
 	@State private var username = ""
 	@State private var password = ""
+	@State private var note = ""
+	@State private var website = ""
 	@State private var pwEntered = false
 	@State private var strongPassword = ""
 	@State private var showCopy = false
@@ -39,10 +41,33 @@ struct AddPasswordView: View {
                       text: $password,
                       pwEntered: $pwEntered,
                       pwStrength: pwStrength)
-				Divider()
         StrongPasswordView(strongPassword: $strongPassword,
                            pw: $password,
                            showCopy: $showCopy)
+				Divider()
+				
+				Section {
+					HStack {
+						Text("Note")
+							.font(.subheadline)
+							.bold()
+							.opacity(0.5)
+							.frame(maxWidth: .infinity, alignment: .leading)
+							.offset(x: 10)
+						Spacer()
+					}
+				}
+				TextField("Add Note", text: $note, axis: .vertical)
+					.lineLimit(2...)
+					.autocapitalization(.none)
+					.padding()
+					.background(Color(.systemGray6))
+					.cornerRadius(10)
+					
+				TextFieldView(title: "Website",
+											showFooter: false,
+											text: $website,
+											pwEntered: $pwEntered)
 
 				Spacer()
 			}
@@ -76,7 +101,12 @@ struct AddPasswordView: View {
 					if title.isEmpty || username.isEmpty || password.isEmpty {
 						pwEntered = true
 					} else {
-						pwManager.addPassword(Password(title: title, username: username, password: password), context: managedObjContext)
+						pwManager.addPassword(Password(title: title,
+																					 username: username,
+																					 password: password,
+																					 note: note,
+																					 website: website),
+																	context: managedObjContext)
 						dismiss()
 					}
 				} label: {

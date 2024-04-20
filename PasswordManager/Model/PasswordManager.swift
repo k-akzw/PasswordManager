@@ -13,6 +13,8 @@ struct Password {
 	var title: String
 	var username: String
 	var password: String
+	var note: String
+	var website: String
 }
 
 class PasswordManager {
@@ -74,6 +76,8 @@ class PasswordManager {
 		DataController().addPassword(title: pw.title,
 																 username: pw.username,
 																 password: password,
+																 note: pw.note,
+																 website: pw.website,
 																 context: context)
 	}
 	
@@ -85,6 +89,8 @@ class PasswordManager {
 																	title: pw.title,
 																	username: pw.username,
 																	password: password,
+																	note: pw.note,
+																	website: pw.website,
 																	context: context)
 	}
 	

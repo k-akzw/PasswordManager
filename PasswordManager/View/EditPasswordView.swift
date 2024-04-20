@@ -17,6 +17,8 @@ struct EditPasswordView: View {
   @State private var title = ""
   @State private var username = ""
   @State private var password = ""
+	@State private var note = ""
+	@State private var website = ""
   @State private var pwEntered = false
 	@State private var strongPassword = ""
 	@State private var showCopy = false
@@ -40,10 +42,33 @@ struct EditPasswordView: View {
                       text: $password,
                       pwEntered: $pwEntered,
                       pwStrength: pwStrength)
-        Divider()
 				StrongPasswordView(strongPassword: $strongPassword,
                            pw: $password,
                            showCopy: $showCopy)
+				Divider()
+				
+				Section {
+					HStack {
+						Text("Note")
+							.font(.subheadline)
+							.bold()
+							.opacity(0.5)
+							.frame(maxWidth: .infinity, alignment: .leading)
+							.offset(x: 10)
+						Spacer()
+					}
+				}
+				TextField("Add Note", text: $note, axis: .vertical)
+					.lineLimit(2...)
+					.autocapitalization(.none)
+					.padding()
+					.background(Color(.systemGray6))
+					.cornerRadius(10)
+					
+				TextFieldView(title: "Website",
+											showFooter: false,
+											text: $website,
+											pwEntered: $pwEntered)
 
 				Spacer()
 			}
@@ -68,6 +93,8 @@ struct EditPasswordView: View {
       title = pw.title!
       username = pw.username!
       password = pwManager.getPassword(pw.password!)
+			note = pw.note!
+			website = pw.website!
 			strongPassword = pwManager.generatePassword(length: 12)
     }
     .toolbar {
@@ -87,7 +114,12 @@ struct EditPasswordView: View {
           if title.isEmpty || username.isEmpty || password.isEmpty {
             pwEntered = true
           } else {
-            pwManager.editPassword(Password(title: title, username: username, password: password), to: pw, context: managedObjContext)
+            pwManager.editPassword(Password(title: title,
+																						username: username,
+																						password: password,
+																						note: note,
+																						website: website),
+																	 to: pw, context: managedObjContext)
             dismiss()
           }
         } label: {

@@ -25,24 +25,35 @@ struct PasswordDetailView: View {
         VStack {
           TextView(title: "Username",
                    text: pw.username!,
-                   showCopy: $showCopy)
+									 showCopy: $showCopy,
+									 isNote: false)
           if hidePassword {
             // display password as "●"
             TextView(title: "Password",
                      text: String(repeating: "●",
                                   count: pwManager.getPassword(pw.password!).count),
-                     showCopy: $showCopy)
+										 showCopy: $showCopy,
+										 isNote: false)
             .onTapGesture {
               hidePassword = false
             }
           } else {
             TextView(title: "Password",
                      text: pwManager.getPassword(pw.password!),
-                     showCopy: $showCopy)
+										 showCopy: $showCopy,
+										 isNote: false)
             .onTapGesture {
               hidePassword = true
             }
           }
+					TextView(title: "Note", 
+									 text: pw.note!,
+									 showCopy: $showCopy, 
+									 isNote: true)
+					TextView(title: "Website",
+									 text: pw.website!,
+									 showCopy: $showCopy,
+									 isNote: false)
 
           Spacer()
 
@@ -114,6 +125,7 @@ struct TextView: View {
   var title: String
   var text: String
   @Binding var showCopy: Bool
+	var isNote: Bool
 
   var body: some View {
     HStack {
@@ -132,9 +144,10 @@ struct TextView: View {
       .frame(maxWidth: .infinity, alignment: .leading)
       .background(Color(.systemGray6))
       .cornerRadius(10)
+			.multilineTextAlignment(.leading)
       .overlay {
         // copies entered text
-        if !text.contains("●") {
+        if !text.contains("●") && !isNote {
           HStack {
             Spacer()
             Image(systemName: "doc")

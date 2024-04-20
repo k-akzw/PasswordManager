@@ -28,20 +28,24 @@ class DataController: ObservableObject {
     }
   }
 
-  func addPassword(title: String, username: String, password: Data, context: NSManagedObjectContext) {
+	func addPassword(title: String, username: String, password: Data, note: String, website: String, context: NSManagedObjectContext) {
     let pw = Passwords(context: context)
     pw.id = UUID()
     pw.title = title
     pw.username = username
     pw.password = password
+		pw.note = note
+		pw.website = website
 
     save(context: context)
   }
 
-  func editPassword(_ pw: Passwords, title: String, username: String, password: Data, context: NSManagedObjectContext) {
+	func editPassword(_ pw: Passwords, title: String, username: String, password: Data, note: String, website: String, context: NSManagedObjectContext) {
     pw.title = title
     pw.username = username
     pw.password = password
+		pw.note = note
+		pw.website = website
 
     save(context: context)
   }
