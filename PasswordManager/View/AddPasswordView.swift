@@ -20,6 +20,7 @@ struct AddPasswordView: View {
   @State private var strongPassword = ""
   @State private var showCopy = false
   @State private var pwStrength = 0
+  @State private var showAlert = false
 
   var body: some View {
     ZStack {
@@ -35,6 +36,14 @@ struct AddPasswordView: View {
         TextFieldView(title: "Password",
                       showFooter: true,
                       text: $password)
+        .alert("Are you sure?", isPresented: $showAlert) {
+          Button("Cancel", role: .cancel) { }
+          Button("Save") {
+            savePassword()
+          }
+        } message: {
+          Text("Password is weak and can be easily guessed.")
+        }
         PwStrengthView(pwStrength: $pwStrength)
         StrongPasswordView(strongPassword: $strongPassword,
                            pw: $password,
@@ -92,15 +101,13 @@ struct AddPasswordView: View {
       // saves new password
       ToolbarItem(placement: .topBarTrailing) {
         Button {
-          pwManager.addPassword(Password(title: title,
-                                         username: username,
-                                         password: password,
-                                         note: note,
-                                         website: website),
-                                context: managedObjContext)
-          dismiss()
+          if pwStrength < 4 {
+            showAlert = true
+          } else {
+            savePassword()
+          }
         } label: {
-          Text("Done")
+          Text("Save")
         }
         .disabled(title.isEmpty || username.isEmpty || password.isEmpty)
       }
@@ -110,6 +117,16 @@ struct AddPasswordView: View {
     .toolbarBackground(.visible, for: .navigationBar)
     .toolbarColorScheme(.dark, for: .navigationBar)
     .navigationBarBackButtonHidden()
+  }
+
+  private func savePassword() {
+    pwManager.addPassword(Password(title: title,
+                                   username: username,
+                                   password: password,
+                                   note: note,
+                                   website: website),
+                          context: managedObjContext)
+    dismiss()
   }
 }
 
