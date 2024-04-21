@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import WebKit
 
 struct PasswordDetailView: View {
   @Environment(\.managedObjectContext) var managedObjContext
@@ -13,11 +14,11 @@ struct PasswordDetailView: View {
 
   var pwManager = PasswordManager.shared
   var pw: FetchedResults<Passwords>.Element
-
-  @State var hidePassword = true
-  @State var showEditView = false
+  @State private var hidePassword = true
+  @State private var showEditView = false
   @State private var showCopy = false
   @State private var showAlert = false
+  @State private var showUrlInvalid = false
 
   var body: some View {
     ZStack {
@@ -25,39 +26,43 @@ struct PasswordDetailView: View {
         VStack {
           TextView(title: "Username",
                    text: pw.username!,
-									 showCopy: $showCopy,
-									 isNote: false)
+                   isNote: false, 
+                   showCopy: $showCopy)
+
+          // display password as "●" initially
           if hidePassword {
-            // display password as "●"
             TextView(title: "Password",
                      text: String(repeating: "●",
                                   count: pwManager.getPassword(pw.password!).count),
-										 showCopy: $showCopy,
-										 isNote: false)
+                     isNote: false, 
+                     showCopy: $showCopy)
             .onTapGesture {
               hidePassword = false
             }
           } else {
             TextView(title: "Password",
                      text: pwManager.getPassword(pw.password!),
-										 showCopy: $showCopy,
-										 isNote: false)
+                     isNote: false, 
+                     showCopy: $showCopy)
             .onTapGesture {
               hidePassword = true
             }
           }
-					TextView(title: "Note", 
-									 text: pw.note!,
-									 showCopy: $showCopy, 
-									 isNote: true)
-					TextView(title: "Website",
-									 text: pw.website!,
-									 showCopy: $showCopy,
-									 isNote: false)
+
+          TextView(title: "Note",
+                   text: pw.note!,
+                   isNote: true, 
+                   showCopy: $showCopy)
+
+          WebTextView(website: pw.website!,
+                      showCopy: $showCopy,
+                      showUrlInvalid: $showUrlInvalid)
 
           Spacer()
 
+          // delete button
           Button {
+            // shows alert before deleting
             showAlert = true
           } label: {
             Text("Delete Password")
@@ -68,6 +73,7 @@ struct PasswordDetailView: View {
               .cornerRadius(10)
               .alert("Are you sure?", isPresented: $showAlert) {
                 Button("Cancel", role: .cancel) { }
+                // delete pw from database and go back to pw list
                 Button("Delete", role: .destructive) {
                   dismiss()
                   DataController().deletePassword(pw, context: managedObjContext)
@@ -85,9 +91,18 @@ struct PasswordDetailView: View {
             }
           }
         }
+        .onChange(of: showUrlInvalid) { _, newVal in
+          if newVal {
+            // show invalid url popup view for a second
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+              showUrlInvalid = false
+            }
+          }
+        }
       }
 
       PopupView(text: "Text Copied", show: $showCopy)
+      PopupView(text: "Invalid URL", show: $showUrlInvalid)
     }
     .navigationDestination(isPresented: $showEditView, destination: {
       EditPasswordView(pw: pw)
@@ -124,8 +139,8 @@ struct PasswordDetailView: View {
 struct TextView: View {
   var title: String
   var text: String
+  var isNote: Bool
   @Binding var showCopy: Bool
-	var isNote: Bool
 
   var body: some View {
     HStack {
@@ -144,12 +159,13 @@ struct TextView: View {
       .frame(maxWidth: .infinity, alignment: .leading)
       .background(Color(.systemGray6))
       .cornerRadius(10)
-			.multilineTextAlignment(.leading)
+      .multilineTextAlignment(.leading)
       .overlay {
-        // copies entered text
+        // cannot copy pw when hidden or note
         if !text.contains("●") && !isNote {
           HStack {
             Spacer()
+            // copies entered text
             Image(systemName: "doc")
               .padding()
               .opacity(0.5)
@@ -163,6 +179,72 @@ struct TextView: View {
   }
 }
 
+struct WebTextView: View {
+  var website: String
+  @Binding var showCopy: Bool
+  @Binding var showUrlInvalid: Bool
+
+  @State private var showWebsite = false
+  @State private var addProtocol = false
+
+  var body: some View {
+    HStack {
+      Text("Website")
+        .font(.subheadline)
+        .bold()
+        .opacity(0.5)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .offset(x: 10)
+      Spacer()
+    }
+
+    Button {
+      // check if url is valid
+      // if not, add "https://" and check if it is valid
+      // otherwise, it's not valid url
+      if let url = URL(string: website), UIApplication.shared.canOpenURL(url) {
+        showWebsite = true
+        print("valid url")
+      } else if let url = URL(string: "https://\(website)"), UIApplication.shared.canOpenURL(url) {
+        addProtocol = true
+        showWebsite = true
+        print("add http \(website)")
+      } else {
+        showUrlInvalid = true
+      }
+    } label: {
+      Text(website)
+        .padding()
+        .opacity(0.7)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .foregroundStyle(Color.black)
+        .background(Color(.systemGray6))
+        .cornerRadius(10)
+        .multilineTextAlignment(.leading)
+        .overlay {
+
+          HStack {
+            Spacer()
+            // copies entered text
+            Image(systemName: "doc")
+              .padding()
+              .opacity(0.5)
+              .foregroundStyle(Color.black)
+              .onTapGesture {
+                showCopy = true
+                UIPasteboard.general.string = website
+              }
+          }
+        }
+    }
+    .sheet(isPresented: $showWebsite) {
+      WebView(url: website, addProtocol: $addProtocol)
+    }
+  }
+}
+
+// text at the bottom of the screen
+// display this view while @show is true
 struct PopupView: View {
   var text: String
   @Binding var show: Bool
@@ -170,7 +252,7 @@ struct PopupView: View {
   var body: some View {
     VStack {
       Spacer()
-      Text("Text Copied")
+      Text(text)
         .padding()
         .frame(width: 280, alignment: .center)
         .foregroundStyle(Color.white)
@@ -178,6 +260,22 @@ struct PopupView: View {
         .cornerRadius(12)
     }
     .opacity(show ? 1 : 0)
+  }
+}
+
+// Webview inside the app
+struct WebView: UIViewRepresentable {
+  let url: String
+  @Binding var addProtocol: Bool
+
+  func makeUIView(context: Context) -> WKWebView {
+    return WKWebView()
+  }
+
+  func updateUIView(_ webView: WKWebView, context: Context) {
+    let urlString = addProtocol ? "https://\(url)" : url
+    let request = URLRequest(url: URL(string: urlString)!)
+    webView.load(request)
   }
 }
 

@@ -8,203 +8,148 @@
 import SwiftUI
 
 struct AddPasswordView: View {
-	@Environment(\.managedObjectContext) var managedObjContext
-	@Environment(\.dismiss) var dismiss
-	
-	private var pwManager = PasswordManager.shared
-	
-	@State private var title = ""
-	@State private var username = ""
-	@State private var password = ""
-	@State private var note = ""
-	@State private var website = ""
-	@State private var pwEntered = false
-	@State private var strongPassword = ""
-	@State private var showCopy = false
-	@State private var pwStrength = 0
-	
-	var body: some View {
-		ZStack {
-			VStack {
-				TextFieldView(title: "Title", 
+  @Environment(\.managedObjectContext) var managedObjContext
+  @Environment(\.dismiss) var dismiss
+
+  private var pwManager = PasswordManager.shared
+  @State private var title = ""
+  @State private var username = ""
+  @State private var password = ""
+  @State private var note = ""
+  @State private var website = ""
+  @State private var strongPassword = ""
+  @State private var showCopy = false
+  @State private var pwStrength = 0
+
+  var body: some View {
+    ZStack {
+      VStack {
+        TextFieldView(title: "Title",
                       showFooter: true,
-                      text: $title,
-                      pwEntered: $pwEntered)
-				Divider()
-				TextFieldView(title: "Username", 
+                      text: $title)
+        Divider()
+        TextFieldView(title: "Username",
                       showFooter: true,
-                      text: $username,
-                      pwEntered: $pwEntered)
-				Divider()
-				TextFieldView(title: "Password", 
+                      text: $username)
+        Divider()
+        TextFieldView(title: "Password",
                       showFooter: true,
-                      text: $password,
-                      pwEntered: $pwEntered,
-                      pwStrength: pwStrength)
+                      text: $password)
+        PwStrengthView(pwStrength: $pwStrength)
         StrongPasswordView(strongPassword: $strongPassword,
                            pw: $password,
                            showCopy: $showCopy)
-				Divider()
-				
-				Section {
-					HStack {
-						Text("Note")
-							.font(.subheadline)
-							.bold()
-							.opacity(0.5)
-							.frame(maxWidth: .infinity, alignment: .leading)
-							.offset(x: 10)
-						Spacer()
-					}
-				}
-				TextField("Add Note", text: $note, axis: .vertical)
-					.lineLimit(2...)
-					.autocapitalization(.none)
-					.padding()
-					.background(Color(.systemGray6))
-					.cornerRadius(10)
-					
-				TextFieldView(title: "Website",
-											showFooter: false,
-											text: $website,
-											pwEntered: $pwEntered)
+        Divider()
 
-				Spacer()
-			}
-			.opacity(showCopy ? 0.7 : 1)
+        Section {
+          HStack {
+            Text("Note")
+              .font(.subheadline)
+              .bold()
+              .opacity(0.5)
+              .frame(maxWidth: .infinity, alignment: .leading)
+              .offset(x: 10)
+            Spacer()
+          }
+        }
+        TextField("Add Note", text: $note, axis: .vertical)
+          .lineLimit(2...)
+          .autocapitalization(.none)
+          .padding()
+          .background(Color(.systemGray6))
+          .cornerRadius(10)
+        Divider()
+        TextFieldView(title: "Website",
+                      showFooter: false,
+                      text: $website)
+
+        Spacer()
+      }
+      .opacity(showCopy ? 0.7 : 1)
 
       PopupView(text: "Text Copied", show: $showCopy)
-		}
-		.onChange(of: password, { _, _ in
-			pwStrength = pwManager.getPasswordStrength(password)
-		})
-		.onAppear {
-			strongPassword = pwManager.generatePassword(length: 12)
-		}
-		.toolbar {
-			// back button to go back to previous screen
-			ToolbarItem(placement: .topBarLeading) {
-				Button {
-					dismiss()
-				} label: {
-					HStack {
-						Image(systemName: "chevron.left")
-						Text("Back")
-					}
-				}
-			}
-			
-			// saves new password
-			ToolbarItem(placement: .topBarTrailing) {
-				Button {
-					// only save if all entries are entered
-					if title.isEmpty || username.isEmpty || password.isEmpty {
-						pwEntered = true
-					} else {
-						pwManager.addPassword(Password(title: title,
-																					 username: username,
-																					 password: password,
-																					 note: note,
-																					 website: website),
-																	context: managedObjContext)
-						dismiss()
-					}
-				} label: {
-					Text("Done")
-				}
-				.disabled(title.isEmpty || username.isEmpty || password.isEmpty)
-			}
-		}
-		.padding()
-		.toolbarBackground(.orange, for: .navigationBar)
-		.toolbarBackground(.visible, for: .navigationBar)
-		.toolbarColorScheme(.dark, for: .navigationBar)
-		.navigationBarBackButtonHidden()
-	}
+    }
+    .navigationTitle("Add Password")
+    .onChange(of: password, { _, _ in
+      pwStrength = pwManager.getPasswordStrength(password)
+    })
+    .onAppear {
+      strongPassword = pwManager.generatePassword()
+    }
+    .toolbar {
+      // back button to go back to previous screen
+      ToolbarItem(placement: .topBarLeading) {
+        Button {
+          dismiss()
+        } label: {
+          HStack {
+            Image(systemName: "chevron.left")
+            Text("Back")
+          }
+        }
+      }
+
+      // saves new password
+      ToolbarItem(placement: .topBarTrailing) {
+        Button {
+          pwManager.addPassword(Password(title: title,
+                                         username: username,
+                                         password: password,
+                                         note: note,
+                                         website: website),
+                                context: managedObjContext)
+          dismiss()
+        } label: {
+          Text("Done")
+        }
+        .disabled(title.isEmpty || username.isEmpty || password.isEmpty)
+      }
+    }
+    .padding()
+    .toolbarBackground(.orange, for: .navigationBar)
+    .toolbarBackground(.visible, for: .navigationBar)
+    .toolbarColorScheme(.dark, for: .navigationBar)
+    .navigationBarBackButtonHidden()
+  }
 }
 
 struct TextFieldView: View {
   var title: String
   var showFooter: Bool
   @Binding var text: String
-  @Binding var pwEntered: Bool
-  var pwStrength: Int?
 
   var body: some View {
-    Section {
-      HStack {
-        Text(title)
-          .font(.subheadline)
-          .bold()
-          .opacity(0.5)
-          .frame(maxWidth: .infinity, alignment: .leading)
-          .offset(x: 10)
-        Spacer()
-      }
-
-      TextField("", text: $text)
-        .autocapitalization(.none)
-        .padding()
-        .opacity(0.7)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.systemGray6))
-        .cornerRadius(10)
-        .overlay {
-          HStack {
-            Spacer()
-            // deletes @text
-            Image(systemName: "xmark.circle.fill")
-              .padding()
-              .foregroundColor(Color.secondary)
-              .opacity(text.isEmpty ? 0.2 : 1)
-              .onTapGesture {
-                text = ""
-              }
-          }
-        }
-        .autocorrectionDisabled()
-        .onChange(of: text) { _, newVal in
-          // when user deletes the wrong password previously entered
-          // reset @passwordEntered
-          // so that it doesn't give error message
-          // while retyping the password
-          if newVal.isEmpty {
-            pwEntered = false
-          }
-        }
-    } footer: {
-      // password strength meter
-      if let pwStrength = pwStrength {
-        ProgressView(value: Double(pwStrength), total: 5.0)
-          .scaleEffect(x: 1.0, y: 2.5)
-          .tint(getColor(pwStrength: pwStrength))
-          .cornerRadius(0.2)
-      }
-
-      Text("This field cannot be empty. ")
-        .foregroundStyle(.red)
+    HStack {
+      Text(title)
+        .font(.subheadline)
+        .bold()
+        .opacity(0.5)
         .frame(maxWidth: .infinity, alignment: .leading)
         .offset(x: 10)
-        .opacity(showFooter && pwEntered && text.isEmpty ? 1 : 0)
-        .padding(0)
+      Spacer()
     }
-  }
 
-  private func getColor(pwStrength: Int) -> Color{
-    switch pwStrength {
-    case 1:
-      return Color.red
-    case 2:
-      return Color.init(red: 1, green: 0.5, blue: 0)
-    case 3:
-      return Color.yellow
-    case 4:
-      return Color.init(red: 0.5, green: 1, blue: 0.5)
-    case 5:
-      return Color.green
-    default:
-      return Color.white
-    }
+    TextField("", text: $text)
+      .autocapitalization(.none)
+      .padding()
+      .opacity(0.7)
+      .frame(maxWidth: .infinity, alignment: .leading)
+      .background(Color(.systemGray6))
+      .cornerRadius(10)
+      .overlay {
+        HStack {
+          Spacer()
+          // deletes @text
+          Image(systemName: "xmark.circle.fill")
+            .padding()
+            .foregroundColor(Color.secondary)
+            .opacity(text.isEmpty ? 0.2 : 1)
+            .onTapGesture {
+              text = ""
+            }
+        }
+      }
+      .autocorrectionDisabled()
   }
 }
 
@@ -223,12 +168,12 @@ struct StrongPasswordView: View {
 
       // regenerates strong password
       Button {
-        strongPassword = PasswordManager.shared.generatePassword(length: 12)
+        strongPassword = PasswordManager.shared.generatePassword()
       } label: {
         Image(systemName: "arrow.triangle.2.circlepath")
           .foregroundStyle(Color.black)
           .bold()
-          .opacity(0.5)
+          .opacity(0.4)
       }
       .padding(.horizontal)
 
@@ -252,6 +197,37 @@ struct StrongPasswordView: View {
           }
         }
       })
+  }
+}
+
+// display linear progress view based on @pwStrength
+struct PwStrengthView: View {
+  @Binding var pwStrength: Int
+
+  var body: some View {
+    ProgressView(value: Double(pwStrength), total: 5.0)
+      .scaleEffect(x: 1.0, y: 2.5)
+      // change color based on strength
+      .tint(getColor(pwStrength: pwStrength))
+      .cornerRadius(0.2)
+  }
+
+  // if weak, red and if strong, green
+  private func getColor(pwStrength: Int) -> Color{
+    switch pwStrength {
+    case 1:
+      return Color.red
+    case 2:
+      return Color.init(red: 1, green: 0.5, blue: 0)
+    case 3:
+      return Color.yellow
+    case 4:
+      return Color.init(red: 0.5, green: 1, blue: 0.5)
+    case 5:
+      return Color.green
+    default:
+      return Color.white
+    }
   }
 }
 

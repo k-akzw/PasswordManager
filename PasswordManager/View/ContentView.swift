@@ -12,7 +12,6 @@ struct ContentView: View {
   @Environment(\.managedObjectContext) var managedObjContext
 
   private var pwManager = PasswordManager.shared
-
   @State var accessGranted = false
   @State var showChangeView = false
 
@@ -56,16 +55,16 @@ struct ContentView: View {
 }
 
 struct MasterPasswordView: View {
+  @Binding var accessGranted: Bool
+  @Binding var showChangeView: Bool
+
   var pwManager = PasswordManager.shared
   @State var masterPassword = ""
   @State var pwEntered = false
 
-  @Binding var accessGranted: Bool
-  @Binding var showChangeView: Bool
-
   var body: some View {
 		// if master password has not been set
-		// display text "Set Password"
+		// display text, "Set Password"
     if !pwManager.doesMasterPasswordExist() {
       Text("Set Password")
         .font(.subheadline)

@@ -13,7 +13,6 @@ struct PasswordListView: View {
   @FetchRequest(sortDescriptors: [SortDescriptor(\Passwords.title)]) var pw: FetchedResults<Passwords>
 
   private var pwManager = PasswordManager.shared
-
   @State private var username = ""
   @State private var showAddView = false
   @State private var showAlert = false
@@ -29,6 +28,8 @@ struct PasswordListView: View {
         Spacer()
       } else {
         List {
+          // display each pw's title and username
+          // if tapped, navigate to detail view of that pw
           ForEach(pw) { pw in
             NavigationLink(destination: PasswordDetailView(pw: pw)) {
               VStack {
@@ -47,9 +48,12 @@ struct PasswordListView: View {
           }
           .onDelete(perform: showAlert)
         }
+        // show alert message before deleting password
         .alert("Are you sure?", isPresented: $showAlert) {
           Button("Cancel", role: .cancel) { }
           Button("Delete", role: .destructive) {
+            // delete @pwToDelete from database
+            // when user attempts to delete, pwToDelete is set to that pw
             for pw in pwToDelete {
               DataController().deletePassword(pw, context: managedObjContext)
             }
@@ -78,6 +82,8 @@ struct PasswordListView: View {
     .navigationBarBackButtonHidden()
   }
 
+  // sets @pwToDelete to pw that user attempted to delete
+  // and shows alert
   private func showAlert(offsets: IndexSet) {
     pwToDelete = offsets.map{ pw[$0] }
     showAlert = true

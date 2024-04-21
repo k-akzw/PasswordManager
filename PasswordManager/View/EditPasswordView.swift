@@ -13,13 +13,11 @@ struct EditPasswordView: View {
 
   var pwManager = PasswordManager.shared
   var pw: FetchedResults<Passwords>.Element
-
   @State private var title = ""
   @State private var username = ""
   @State private var password = ""
 	@State private var note = ""
 	@State private var website = ""
-  @State private var pwEntered = false
 	@State private var strongPassword = ""
 	@State private var showCopy = false
 	@State private var pwStrength = 0
@@ -29,19 +27,16 @@ struct EditPasswordView: View {
 			VStack {
 				TextFieldView(title: "Title", 
                       showFooter: true,
-                      text: $title,
-                      pwEntered: $pwEntered)
+                      text: $title)
 				Divider()
 				TextFieldView(title: "Username", 
                       showFooter: true,
-                      text: $username,
-                      pwEntered: $pwEntered)
+                      text: $username)
 				Divider()
 				TextFieldView(title: "Password", 
                       showFooter: true,
-                      text: $password,
-                      pwEntered: $pwEntered,
-                      pwStrength: pwStrength)
+                      text: $password)
+        PwStrengthView(pwStrength: $pwStrength)
 				StrongPasswordView(strongPassword: $strongPassword,
                            pw: $password,
                            showCopy: $showCopy)
@@ -64,11 +59,10 @@ struct EditPasswordView: View {
 					.padding()
 					.background(Color(.systemGray6))
 					.cornerRadius(10)
-					
+        Divider()
 				TextFieldView(title: "Website",
 											showFooter: false,
-											text: $website,
-											pwEntered: $pwEntered)
+											text: $website)
 
 				Spacer()
 			}
@@ -86,6 +80,7 @@ struct EditPasswordView: View {
 			.opacity(showCopy ? 1 : 0)
 		}
     .padding()
+    .navigationTitle("Edit Password")
 		.onChange(of: password, { _, _ in
 			pwStrength = pwManager.getPasswordStrength(password)
 		})
@@ -95,7 +90,7 @@ struct EditPasswordView: View {
       password = pwManager.getPassword(pw.password!)
 			note = pw.note!
 			website = pw.website!
-			strongPassword = pwManager.generatePassword(length: 12)
+			strongPassword = pwManager.generatePassword()
     }
     .toolbar {
 			ToolbarItem(placement: .topBarLeading) {
@@ -111,17 +106,13 @@ struct EditPasswordView: View {
 			
       ToolbarItem(placement: .topBarTrailing) {
         Button {
-          if title.isEmpty || username.isEmpty || password.isEmpty {
-            pwEntered = true
-          } else {
-            pwManager.editPassword(Password(title: title,
-																						username: username,
-																						password: password,
-																						note: note,
-																						website: website),
-																	 to: pw, context: managedObjContext)
-            dismiss()
-          }
+          pwManager.editPassword(Password(title: title,
+                                          username: username,
+                                          password: password,
+                                          note: note,
+                                          website: website),
+                                 to: pw, context: managedObjContext)
+          dismiss()
         } label: {
           Text("Done")
         }

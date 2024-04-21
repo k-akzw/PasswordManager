@@ -13,13 +13,12 @@ struct ChangePasswordView: View {
   private var pwManager = PasswordManager.shared
   @State private var curPw = ""
   @State private var newPw = ""
-  @State private var pwEntered = false
   @State private var wrongPw = false
 
   var body: some View {
     VStack {
-      TextFieldView(title: "Current Password", showFooter: false, text: $curPw, pwEntered: $pwEntered)
-      TextFieldView(title: "New Password", showFooter: true, text: $newPw, pwEntered: $pwEntered)
+      TextFieldView(title: "Current Password", showFooter: false, text: $curPw)
+      TextFieldView(title: "New Password", showFooter: true, text: $newPw)
 
       Text("Wrong Password")
         .bold()
