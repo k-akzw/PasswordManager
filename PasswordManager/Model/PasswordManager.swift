@@ -40,8 +40,7 @@ class PasswordManager {
     if let keyData = UserDefaults.standard.data(forKey: symmetricKey) {
       key = SymmetricKey(data: keyData)
     } else {
-      // generate symmetric key if it doesn't exist yet
-      key = SymmetricKey(size: .bits256)
+      // new symmetric key is created when object of this class is created
       // convert symmetric key to Data and store in UserDefaults
       let keyData = key.withUnsafeBytes { Data($0) }
       UserDefaults.standard.set(keyData, forKey: symmetricKey)
@@ -56,7 +55,7 @@ class PasswordManager {
     // generate salt and save to UserDefault
     let salt = getSalt()
     UserDefaults.standard.set(salt, forKey: saltKey)
-    // add salt and hash
+    // add salt, hash and save to UserDefault
     UserDefaults.standard.set(hashPassword(pw, salt: salt), forKey: masterPwKey)
   }
 
@@ -69,7 +68,8 @@ class PasswordManager {
   // checks if master password saved in UserDefaults matches @pw
   func doesMasterPasswordMatch(_ pw: String) -> Bool {
     // get master password from UserDefault
-    guard let masterPw = UserDefaults.standard.data(forKey: masterPwKey) else { return false
+    guard let masterPw = UserDefaults.standard.data(forKey: masterPwKey) else { 
+      return false
     }
     // get salt from UserDefault
     guard let salt = UserDefaults.standard.data(forKey: saltKey) else {
@@ -217,9 +217,7 @@ class PasswordManager {
       // extract salt from decrypted data
       let pwData = decryptedData.dropLast(saltLength)
       // converts data to string using UTF8
-      let pw = String(data: pwData, encoding: .utf8)
-      // remove salt
-      return pw
+      return String(data: pwData, encoding: .utf8)
     } catch {
       print("Decryption failed: \(error.localizedDescription)")
       return nil
